@@ -1,7 +1,7 @@
 # HECKTOR2026 — Docker Submission Template
 
 <p align="center">
-  <img src="assets/images/HECKTOR-main.jpeg">
+  <img src="assets/images/HECKTOR_2026_Banner.png">
 </p>
 
 ---
