@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime AS hecktor2026-task
+FROM --platform=linux/amd64 pytorch/pytorch:2.9.1-cuda12.6-cudnn9-runtime AS hecktor2026-task
 
 # Ensures that Python output to stdout/stderr is not buffered
 ENV PYTHONUNBUFFERED=1
@@ -9,7 +9,6 @@ USER user
 WORKDIR /opt/app
 
 COPY --chown=user:user requirements.txt /opt/app/
-COPY --chown=user:user resources /opt/app/resources
 
 RUN python -m pip install \
     --user \

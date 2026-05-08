@@ -1,0 +1,55 @@
+[
+    {
+        "socket": {
+            "slug": "ct-image",
+            "relative_path": "images/ct",
+            "is_image_kind": true,
+            "is_panimg_kind": true,
+            "is_dicom_image_kind": false,
+            "is_json_kind": false,
+            "is_file_kind": false
+        },
+        "file": null,
+        "image": {
+            "name": "the_original_filename_of_the_file_that_was_uploaded_or_image_set"
+        },
+        "value": null
+    },
+    {
+        "socket": {
+            "slug": "pet-image",
+            "relative_path": "images/pet",
+            "is_image_kind": true,
+            "is_panimg_kind": true,
+            "is_dicom_image_kind": false,
+            "is_json_kind": false,
+            "is_file_kind": false
+        },
+        "file": null,
+        "image": {
+            "name": "the_original_filename_of_the_file_that_was_uploaded_or_image_set"
+        },
+        "value": null
+    },
+    {
+        "socket": {
+            "slug": "electronic-health-record",
+            "relative_path": "ehr.json",
+            "example_value": {
+                "key": "value",
+                "None": null
+            },
+            "is_image_kind": false,
+            "is_panimg_kind": false,
+            "is_dicom_image_kind": false,
+            "is_json_kind": true,
+            "is_file_kind": false
+        },
+        "file": null,
+        "image": null,
+        "value": {
+            "key": "value",
+            "None": null
+        }
+    }
+]

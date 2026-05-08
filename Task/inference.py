@@ -6,16 +6,19 @@ It reads a paired CT + PET scan and clinical data (EHR) from /input,
 runs the three-stage pipeline, and writes all outputs to /output:
 
   Subtask 1 — Segmentation:
-      /output/images/tumor-lymph-node-segmentation/output.mha
+      /output/images/head-neck-tumor-segmentation/output.mha
         (label 0=background, 1=GTVp, 2=GTVn)
 
   Subtask 2 — TN Staging:
-      /output/tn-staging.json
-        {"T_stage": "T2", "N_stage": "N2"}
+      /output/t-stage.json   → "T2"
+      /output/n-stage.json   → "N1"
 
   Subtask 3 — Prognosis (RFS):
       /output/recurrence-free-survival.json
         {"recurrence-free-survival": <float>}
+
+Model weights are loaded from /opt/ml/model at runtime (uploaded separately
+as a tarball to Grand Challenge via Algorithm > Models).
 
 To test locally:
     ./do_test_run.sh
@@ -33,7 +36,7 @@ import numpy as np
 
 INPUT_PATH = Path("/input")
 OUTPUT_PATH = Path("/output")
-RESOURCE_PATH = Path("resources")
+MODEL_PATH = Path("/opt/ml/model")
 
 
 def run():
@@ -52,7 +55,7 @@ def run():
     segmentation_array = run_segmentation(ct_path, pet_path, ehr)
 
     write_segmentation(
-        location=OUTPUT_PATH / "images/tumor-lymph-node-segmentation",
+        location=OUTPUT_PATH / "images/head-neck-tumor-segmentation",
         array=segmentation_array,
         reference_path=ct_path,
     )
@@ -64,10 +67,8 @@ def run():
     # ------------------------------------------------------------------
     t_stage, n_stage = run_tn_staging(ct_path, pet_path, ehr, segmentation_array)
 
-    write_json(
-        location=OUTPUT_PATH / "tn-staging.json",
-        data={"T_stage": t_stage, "N_stage": n_stage},
-    )
+    write_json(location=OUTPUT_PATH / "t-stage.json", data=t_stage)
+    write_json(location=OUTPUT_PATH / "n-stage.json", data=n_stage)
 
     # ------------------------------------------------------------------
     # 4. Subtask 3 — Prognosis
@@ -90,7 +91,7 @@ def run():
 
 def run_segmentation(ct_path, pet_path, ehr):
     """
-    Load your segmentation model from RESOURCE_PATH/checkpoints and run inference.
+    Load your segmentation model from MODEL_PATH and run inference.
     Returns a numpy array with labels: 0=background, 1=GTVp, 2=GTVn.
     """
     ct_image = SimpleITK.ReadImage(ct_path)
@@ -101,7 +102,7 @@ def run_segmentation(ct_path, pet_path, ehr):
 
 def run_tn_staging(ct_path, pet_path, ehr, segmentation_array):
     """
-    Load your TN staging model from RESOURCE_PATH/checkpoints and run inference.
+    Load your TN staging model from MODEL_PATH and run inference.
     Returns (t_stage: str, n_stage: str), e.g. ("T2", "N1").
     TN staging follows AJCC/UICC 7th Edition (N2b and N2c collapsed to N2).
     """
@@ -113,7 +114,7 @@ def run_tn_staging(ct_path, pet_path, ehr, segmentation_array):
 
 def run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage):
     """
-    Load your prognosis model from RESOURCE_PATH/checkpoints and run inference.
+    Load your prognosis model from MODEL_PATH and run inference.
     Returns a float risk score (higher = higher recurrence risk).
     """
     # TODO: replace with your prognosis model inference
