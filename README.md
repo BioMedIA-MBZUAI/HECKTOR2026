@@ -56,19 +56,20 @@ Task/
 ├── inference.py            # Entry point — implement your pipeline here
 ├── do_build.sh             # Build the container
 ├── do_test_run.sh          # Test the container locally
-├── do_save.sh              # Save the container as a .tar.gz for upload
-├── resources/
-│   ├── checkpoints/        # Place your model weights here (tracked via Git LFS)
-│   ├── preprocess.py       # Preprocessing utilities
-│   ├── postprocess.py      # Postprocessing utilities
-│   └── utils.py            # Shared model utilities
+├── do_save.sh              # Save the container + model tarball for upload
+├── model/                  # Place your model weights here (tracked via Git LFS).
+│                           # Packed into model.tar.gz by do_save.sh and uploaded
+│                           # separately to Grand Challenge under Algorithm > Models.
+│                           # Mounted at /opt/ml/model at runtime.
 └── test/
     ├── input/
-    │   ├── ehr.json         # Sample clinical data
-    │   └── images/
-    │       ├── ct/          # Place a sample CT .mha file here for local testing
-    │       └── pet/         # Place a sample PET .mha file here for local testing
-    └── output/              # Test outputs written here (gitignored)
+    │   └── interf0/
+    │       ├── ehr.json            # Sample clinical data
+    │       ├── inputs.json         # GC-generated socket metadata
+    │       └── images/
+    │           ├── ct/             # Place a sample CT .mha file here for local testing
+    │           └── pet/            # Place a sample PET .mha file here for local testing
+    └── output/                     # Test outputs written here (gitignored)
 ```
 
 ---
@@ -77,7 +78,7 @@ Task/
 
 ### Step 1 — Add your model weights
 
-Place your trained model weights under `Task/resources/checkpoints/`. These files are tracked via Git LFS.
+Place your trained model weights under `Task/model/`. These files are tracked via Git LFS. At submission time, `do_save.sh` packs this directory into a `model.tar.gz` that you upload **separately** to Grand Challenge under **Algorithm > Models**. At runtime, the tarball is extracted to `/opt/ml/model/` inside your container. Load weights from there in `inference.py`.
 
 ### Step 2 — Add your dependencies
 
@@ -105,20 +106,21 @@ def run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage):
 
 | Output | Path inside container | Format |
 |---|---|---|
-| Segmentation mask | `/output/images/tumor-lymph-node-segmentation/output.mha` | `.mha`, labels 0/1/2 |
-| TN staging | `/output/tn-staging.json` | `{"T_stage": "T2", "N_stage": "N1"}` |
-| Prognosis | `/output/recurrence-free-survival.json` | `{"recurrence-free-survival": -0.42}` |
+| Segmentation mask | `/output/images/head-neck-tumor-segmentation/output.mha` | `.mha`, `uint8`, labels `{0: background, 1: GTVp, 2: GTVn}`, written at the input CT geometry (spacing/origin/direction) |
+| T stage | `/output/t-stage.json` | JSON string, e.g. `"T2"` (AJCC/UICC 7th Edition: `T1`–`T4`) |
+| N stage | `/output/n-stage.json` | JSON string, e.g. `"N1"` (AJCC/UICC 7th Edition: `N0`–`N3`; N2b/N2c collapsed to N2) |
+| Prognosis | `/output/recurrence-free-survival.json` | JSON object `{"recurrence-free-survival": -0.42}` — continuous risk score, **higher = higher recurrence risk** (concordant with shorter RFS) |
 
 ### Step 4 — Add sample test data and test locally
 
-Place a sample CT `.mha` in `Task/test/input/images/ct/` and a sample PET `.mha` in `Task/test/input/images/pet/`, then run:
+Place a sample CT `.mha` in `Task/test/input/interf0/images/ct/` and a sample PET `.mha` in `Task/test/input/interf0/images/pet/`, then run:
 
 ```bash
 cd Task/
 ./do_test_run.sh
 ```
 
-Outputs will be written to `Task/test/output/`.
+Outputs will be written to `Task/test/output/interf0/`.
 
 ### Step 5 — Save and upload
 
@@ -127,7 +129,9 @@ cd Task/
 ./do_save.sh
 ```
 
-This produces a `hecktor2026-task_<timestamp>.tar.gz` file ready for upload to Grand Challenge.
+This produces **two** files ready for upload to Grand Challenge:
+- `hecktor2026-task_<timestamp>.tar.gz` — the container image (upload as your **Algorithm Image**)
+- `model.tar.gz` — your model weights (upload separately under **Algorithm > Models**)
 
 ---
 
@@ -138,18 +142,18 @@ This produces a `hecktor2026-task_<timestamp>.tar.gz` file ready for upload to G
 3. **RAM limit** — peak memory must stay under **16 GB**.
 4. **Container size** — the uploaded `.tar.gz` must not exceed **10 GB**.
 5. **Filesystem** — all writes must go to `/output/` or `/tmp/`. Writing elsewhere will be blocked.
-6. **Time limit** — the full pipeline (all three subtasks) must complete within **20 minutes**.
+6. **Time limit** — the full pipeline (all three subtasks) must complete within **25 minutes**.
 7. **I/O paths** — read from `/input/` only; write to `/output/` only.
 
 ### Common errors
 
 | Error | Likely cause | Fix |
 |---|---|---|
-| `Model file not found` | Missing weights in `resources/checkpoints/` | Add your `.pth`/`.pt` files |
+| `Model file not found` | Missing weights in `model/` (or model tarball not uploaded to GC) | Add your `.pth`/`.pt` files to `Task/model/` |
 | `ModuleNotFoundError` | Missing dependency | Update `requirements.txt` and rebuild |
 | `Permission denied` | Writing outside `/output/` or `/tmp/` | Redirect all writes |
 | `Killed` / OOM | Exceeded memory limit | Reduce batch size or model size |
-| `Timeout` | Exceeded 20-minute limit | Optimize preprocessing and inference |
+| `Timeout` | Exceeded 25-minute limit | Optimize preprocessing and inference |
 
 ---
 
