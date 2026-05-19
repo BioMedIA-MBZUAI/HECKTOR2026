@@ -1,2 +1,10 @@
+# Ignore real inference outputs but track the example files
 *
 !.gitignore
+!interf0/
+!interf0/recurrence-free-survival.json
+!interf0/t-stage.json
+!interf0/n-stage.json
+!interf0/images/
+!interf0/images/head-neck-tumor-segmentation/
+!interf0/images/head-neck-tumor-segmentation/*.mha
