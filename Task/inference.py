@@ -14,8 +14,7 @@ runs the three-stage pipeline, and writes all outputs to /output:
       /output/n-stage.json   → "N1"
 
   Subtask 3 — Prognosis (RFS):
-      /output/recurrence-free-survival.json
-        {"recurrence-free-survival": <float>}
+      /output/rfs.json   → <float>
 
 Model weights are loaded from /opt/ml/model at runtime (uploaded separately
 as a tarball to Grand Challenge via Algorithm > Models).
@@ -77,10 +76,7 @@ def run():
     # ------------------------------------------------------------------
     rfs_score = run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage)
 
-    write_json(
-        location=OUTPUT_PATH / "recurrence-free-survival.json",
-        data={"recurrence-free-survival": float(rfs_score)},
-    )
+    write_json(location=OUTPUT_PATH / "rfs.json", data=float(rfs_score))
 
     return 0
 
