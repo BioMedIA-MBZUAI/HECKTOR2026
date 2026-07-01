@@ -1,4 +1,5 @@
 {
+    "CenterID": 9,
     "Age": 62,
     "Gender": 1,
     "Tobacco Consumption": 1,
@@ -6,5 +7,4 @@
     "Performance Status": 1,
     "Treatment": 1,
     "HPV Status": 1,
-    "M-stage": "M0"
 }
