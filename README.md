@@ -98,7 +98,7 @@ def run_tn_staging(ct_path, pet_path, ehr, segmentation_array):
     ...
 
 def run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage):
-    # Returns float risk score (higher = higher recurrence risk)
+    # Returns float RFS time. The output should be anti-concordant with the predicted risk score (i.e., the model should output RFS in days)
     ...
 ```
 
