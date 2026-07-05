@@ -14,7 +14,7 @@ runs the three-stage pipeline, and writes all outputs to /output:
       /output/n-stage.json   → "N1"
 
   Subtask 3 — Prognosis (RFS):
-      /output/rfs.json   → <float>
+      /output/rfs.json   → <float> RFS time
 
 Model weights are loaded from /opt/ml/model at runtime (uploaded separately
 as a tarball to Grand Challenge via Algorithm > Models).
@@ -111,12 +111,18 @@ def run_tn_staging(ct_path, pet_path, ehr, segmentation_array):
 def run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage):
     """
     Load your prognosis model from MODEL_PATH and run inference.
-    Returns a float risk score (higher = higher recurrence risk).
+    Returns a float RFS Time. The output should be anti-concordant with the predicted risk score (i.e., the model should output RFS in days)
     """
     # TODO: replace with your prognosis model inference
-    rfs_score = 0.0
-    return rfs_score
+    prediction = 0.0
 
+    # If the model predicts a risk score:
+    # prediction = -1.0 * prediction
+
+    # If the model already predicts RFS time in days:
+    # return prediction
+
+    return prediction
 
 # =============================================================================
 # I/O utilities
