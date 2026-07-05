@@ -109,7 +109,7 @@ def run_prognosis(ct_path, pet_path, ehr, segmentation_array, t_stage, n_stage):
 | Segmentation mask | `/output/images/head-neck-tumor-segmentation/output.mha` | `.mha`, `uint8`, labels `{0: background, 1: GTVp, 2: GTVn}`, written at the input CT geometry (spacing/origin/direction) |
 | T stage | `/output/t-stage.json` | JSON string, e.g. `"T2"` (AJCC/UICC 7th Edition: `T1`–`T4`) |
 | N stage | `/output/n-stage.json` | JSON string, e.g. `"N1"` (AJCC/UICC 7th Edition: `N0`–`N3`; N2b/N2c collapsed to N2) |
-| Prognosis | `/output/rfs.json` | JSON float, e.g. `42.0` — continuous risk score |
+| Prognosis | `/output/rfs.json` | JSON float, e.g. `42.0`  |
 
 ### Step 4 — Add sample test data and test locally
 
