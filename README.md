@@ -139,7 +139,7 @@ This produces **two** files ready for upload to Grand Challenge:
 
 1. **No network access** — your container must not attempt any HTTP, SSH, or DNS connections.
 2. **GPU** — inference runs on an NVIDIA T4 (16 GB VRAM). Design your model accordingly.
-3. **RAM limit** — peak memory must stay under **16 GB**.
+3. **RAM limit** — peak memory must stay under **32 GB**.
 4. **Container size** — the uploaded `.tar.gz` must not exceed **10 GB**.
 5. **Filesystem** — all writes must go to `/output/` or `/tmp/`. Writing elsewhere will be blocked.
 6. **Time limit** — the full pipeline (all three subtasks) must complete within **25 minutes**.
