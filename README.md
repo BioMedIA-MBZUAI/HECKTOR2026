@@ -105,7 +105,7 @@ hecktor2026_training/
   ├── CHUM-001/
   │   ├── CHUM-001__CT.nii.gz       # CT image
   │   ├── CHUM-001__PT.nii.gz       # PET image (SUV)
-  │   └── CHUM-001.nii.gz           # Segmentation label (GTVp=1, GTVn=2)
+  │   └── CHUM-001.nii.gz           # Segmentation label (Background= 0, GTVp=1, GTVn=2)
   ├── CHUM-002/
   ├── ...
   └── HECKTOR_2026_Training.csv     # Clinical data + all outcome labels
